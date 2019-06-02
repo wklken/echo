@@ -76,7 +76,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 }
 
 func registerAPIs(r *chi.Mux) {
-	r.HandleFunc("/ping", pong)
+	r.HandleFunc("/ping/", pong)
 
 	// sleep for X ms
 	r.HandleFunc("/sleep/{sleep}/", sleep)

@@ -119,24 +119,16 @@ func fileUpload(w http.ResponseWriter, r *http.Request) {
 	fileName := chi.URLParam(r, "filename")
 
 	r.ParseMultipartForm(32 << 20)
-	file, handler, err := r.FormFile(fileName)
+	// file, handler, err := r.FormFile(fileName)
+	file, _, err := r.FormFile(fileName)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer file.Close()
 
-	fmt.Fprintf(w, "%v", handler.Header)
 	io.Copy(ioutil.Discard, file)
-	// f, err := os.OpenFile("./test/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
-	// if err != nil {
-	//     fmt.Println(err)
-	//     return
-	// }
-	// defer f.Close()
-	// io.Copy(f, file)
 	w.WriteHeader(204)
-	return
 }
 
 func websocket(w http.ResponseWriter, r *http.Request) {

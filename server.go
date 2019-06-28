@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -12,12 +14,18 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	r "github.com/unrolled/render"
+	"gopkg.in/olahol/melody.v1"
 )
 
 var render *r.Render
+var m = melody.New()
 
 func init() {
 	render = r.New() // pass options if you want
+
+	m.HandleMessage(func(s *melody.Session, msg []byte) {
+		m.Broadcast(msg)
+	})
 }
 
 func pong(w http.ResponseWriter, r *http.Request) {
@@ -75,6 +83,71 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, 200, data)
 }
 
+func fileDownload(w http.ResponseWriter, r *http.Request) {
+	// KB
+	sizeStr := chi.URLParam(r, "size")
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil {
+		size = 10
+	}
+
+	buf := make([]byte, size*1024)
+
+	for i := 0; i < len(buf); i++ {
+		buf[i] = '0'
+	}
+
+	file := "data.txt"
+
+	// set the default MIME type to send
+	mime := http.DetectContentType(buf)
+	fileSize := len(string(buf))
+
+	// Generate the server headers
+	w.Header().Set("Content-Type", mime)
+	w.Header().Set("Content-Disposition", "attachment; filename="+file+"")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Content-Transfer-Encoding", "binary")
+	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+
+	http.ServeContent(w, r, file, time.Now(), bytes.NewReader(buf))
+}
+
+func fileUpload(w http.ResponseWriter, r *http.Request) {
+
+	fileName := chi.URLParam(r, "filename")
+
+	r.ParseMultipartForm(32 << 20)
+	file, handler, err := r.FormFile(fileName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	fmt.Fprintf(w, "%v", handler.Header)
+	io.Copy(ioutil.Discard, file)
+	// f, err := os.OpenFile("./test/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	// if err != nil {
+	//     fmt.Println(err)
+	//     return
+	// }
+	// defer f.Close()
+	// io.Copy(f, file)
+	w.WriteHeader(204)
+	return
+}
+
+func websocket(w http.ResponseWriter, r *http.Request) {
+	m.HandleRequest(w, r)
+}
+
+func websocketIndex(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "index.html")
+
+}
+
 func registerAPIs(r *chi.Mux) {
 	r.HandleFunc("/ping/", pong)
 
@@ -86,6 +159,13 @@ func registerAPIs(r *chi.Mux) {
 
 	// get/delete/post/patch...
 	r.HandleFunc("/echo/", echo)
+
+	// file download and upload
+	r.HandleFunc("/file/download/{size}/", fileDownload)
+	r.HandleFunc("/file/upload/{filename}/", fileUpload)
+
+	r.HandleFunc("/ws/index/", websocketIndex)
+	r.HandleFunc("/ws/", websocket)
 }
 
 func main() {

@@ -129,3 +129,57 @@ curl -XPOST http://127.0.0.1:9001/echo/\?a\=1\&b\=2
     "url": "/echo/"
 }
 ```
+
+#### websocket
+
+- /ws/index/ the websocket test page
+- /ws/       the websocket api, will broadcast the message to all client
+
+#### file upload/download
+
+- /file/download/{size}/   the size unit is KB
+
+```
+curl -XGET http://127.0.0.1:9001/file/download/1024/ -vv > a.txt
+
+> GET /file/download/1024/ HTTP/1.1
+> Host: 127.0.0.1:3000
+> User-Agent: curl/7.54.0
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< Accept-Ranges: bytes
+< Content-Control: private, no-transform, no-store, must-revalidate
+< Content-Disposition: attachment; filename=data.txt
+< Content-Length: 1048576
+< Content-Transfer-Encoding: binary
+< Content-Type: text/plain; charset=utf-8
+< Expires: 0
+< Last-Modified: Tue, 02 Jul 2019 08:23:20 GMT
+< Date: Tue, 02 Jul 2019 08:23:20 GMT
+
+du -h a.txt
+1M
+```
+
+
+- /file/upload/{filename}/
+
+```
+curl -XPOST \
+  'http://127.0.0.1:9001/file/upload/data.txt/' \
+  -H 'Content-Type: multipart/form-data' \
+  -F data.txt=@/Downloads/data.txt -v
+
+> POST /file/upload/data.txt/ HTTP/1.1
+> Host: 127.0.0.1:3000
+> User-Agent: curl/7.54.0
+> Accept: */*
+> Content-Length: 10430
+> Expect: 100-continue
+> Content-Type: multipart/form-data; boundary=------------------------1fb40c77823315c2
+>
+< HTTP/1.1 100 Continue
+< HTTP/1.1 204 No Content
+< Date: Tue, 02 Jul 2019 08:25:48 GMT
+```

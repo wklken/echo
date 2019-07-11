@@ -174,6 +174,7 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+	r.Use(middleware.DefaultCompress)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 

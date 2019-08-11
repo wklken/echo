@@ -1,6 +1,10 @@
 package server
 
-import "github.com/go-chi/chi"
+import (
+	"net/http/pprof"
+
+	"github.com/go-chi/chi"
+)
 
 func RegisterAPIs(r *chi.Mux) {
 	r.HandleFunc("/ping/", Pong)
@@ -21,6 +25,17 @@ func RegisterAPIs(r *chi.Mux) {
 	// websocket
 	r.HandleFunc("/ws/index/", WebsocketIndex)
 	r.HandleFunc("/ws/", Websocket)
+
+	// pprof
+	r.HandleFunc("/debug/pprof/", pprof.Index)
+	r.HandleFunc("/debug/pprof/profile/", pprof.Profile)
+	r.HandleFunc("/debug/pprof/cmdline/", pprof.Cmdline)
+	r.HandleFunc("/debug/pprof/symbol/", pprof.Symbol)
+	r.HandleFunc("/debug/pprof/trace/", pprof.Trace)
+	r.Handle("/debug/pprof/block/", pprof.Handler("block"))
+	r.Handle("/debug/pprof/goroutine/", pprof.Handler("goroutine"))
+	r.Handle("/debug/pprof/heap/", pprof.Handler("heap"))
+	r.Handle("/debug/pprof/threadcreate/", pprof.Handler("threadcreate"))
 
 	// ! DONE ================================================
 	// TODO: finish all the handler one by one

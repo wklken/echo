@@ -1,5 +1,10 @@
 # echo
-An server will echo the requests detail into response. For api testing / benchmark for your proxies like APIGateway/ReverseProxy.
+
+Echo server will echo the requests detail into response.
+
+For api testing or benchmarking for your proxies like APIGateway/ReverseProxy/nginx/traefik.
+
+Build on [chi](https://github.com/go-chi/chi) with simple logical, so the performance is good enough.
 
 
 # run
@@ -12,13 +17,13 @@ make build
 
 # apis
 
-#### /ping/
+### /ping/
 
 - AllowedMethods: all
 - return 200 with pong
 
-```
-curl -XPOST http://127.0.0.1:9001/ping/
+```shell
+$ curl -XPOST http://127.0.0.1:9001/ping/
 
 > POST /ping/ HTTP/1.1
 > Host: 127.0.0.1:9001
@@ -33,14 +38,14 @@ curl -XPOST http://127.0.0.1:9001/ping/
 pong
 ```
 
-#### /sleep/{sleep}/
+### /sleep/{sleep}/
 
 - AllowedMethods: all
 - will sleep for `{sleep}` ms
 - return 200 with ok
 
-```
-curl -XPOST http://127.0.0.1:9001/sleep/10/
+```shell
+$ curl -XPOST http://127.0.0.1:9001/sleep/10/
 
 > POST /sleep/10/ HTTP/1.1
 > Host: 127.0.0.1:9001
@@ -57,7 +62,7 @@ ok
 
 and do the benchmark
 
-```
+```shell
 $ wrk -t8 -c1000 -d10s http://127.0.0.1:9000/sleep/10/
 Running 10s test @ http://127.0.0.1:9000/sleep/10/
   8 threads and 1000 connections
@@ -71,13 +76,13 @@ Requests/sec:  69640.30
 Transfer/sec:     11.69MB
 ```
 
-#### /status/{status}/
+### /status/{status}/
 
 - AllowedMethods: all
 - return `{status}`
 
 ```
-curl -XPOST http://127.0.0.1:9001/status/500/
+$ curl -XPOST http://127.0.0.1:9001/status/500/
 
 > POST /status/500/ HTTP/1.1
 > Host: 127.0.0.1:9001
@@ -93,13 +98,13 @@ curl -XPOST http://127.0.0.1:9001/status/500/
 Internal Server Error
 ```
 
-#### /echo/
+### /echo/
 
 - AllowedMethods: all
 - return 200, with the request contents in json
 
-```
-curl -XPOST http://127.0.0.1:9001/echo/\?a\=1\&b\=2
+```shell
+$ curl -XPOST http://127.0.0.1:9001/echo/\?a\=1\&b\=2
 
 > POST /echo/?a=1&b=2 HTTP/1.1
 > Host: 127.0.0.1:9001
@@ -130,17 +135,17 @@ curl -XPOST http://127.0.0.1:9001/echo/\?a\=1\&b\=2
 }
 ```
 
-#### websocket
+### websocket
 
 - /ws/index/ the websocket test page
 - /ws/       the websocket api, will broadcast the message to all client
 
-#### file upload/download
+### file upload/download
 
 - /file/download/{size}/   the size unit is KB
 
-```
-curl -XGET http://127.0.0.1:9001/file/download/1024/ -vv > a.txt
+```shell
+$ curl -XGET http://127.0.0.1:9001/file/download/1024/ -vv > a.txt
 
 > GET /file/download/1024/ HTTP/1.1
 > Host: 127.0.0.1:3000
@@ -158,7 +163,7 @@ curl -XGET http://127.0.0.1:9001/file/download/1024/ -vv > a.txt
 < Last-Modified: Tue, 02 Jul 2019 08:23:20 GMT
 < Date: Tue, 02 Jul 2019 08:23:20 GMT
 
-du -h a.txt
+$ du -h a.txt
 1M
 ```
 
@@ -166,7 +171,7 @@ du -h a.txt
 - /file/upload/{filename}/
 
 ```
-curl -XPOST \
+$ curl -XPOST \
   'http://127.0.0.1:9001/file/upload/data.txt/' \
   -H 'Content-Type: multipart/form-data' \
   -F data.txt=@/Downloads/data.txt -v
@@ -183,3 +188,8 @@ curl -XPOST \
 < HTTP/1.1 204 No Content
 < Date: Tue, 02 Jul 2019 08:25:48 GMT
 ```
+
+# TODO
+
+- [ ] httpbin apis
+

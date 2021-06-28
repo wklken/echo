@@ -24,7 +24,7 @@ func init() {
 	render = r.New() // pass options if you want
 
 	m.HandleMessage(func(s *melody.Session, msg []byte) {
-		m.Broadcast(msg)
+		_ = m.Broadcast(msg)
 	})
 }
 
@@ -137,7 +137,6 @@ func websocket(w http.ResponseWriter, r *http.Request) {
 
 func websocketIndex(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
-
 }
 
 func registerAPIs(r *chi.Mux) {
@@ -174,13 +173,15 @@ func main() {
 	}
 
 	r := chi.NewRouter()
-	r.Use(middleware.DefaultCompress)
+	r.Use(middleware.NewCompressor(5 ).Handler)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
 	registerAPIs(r)
 
 	addr := fmt.Sprintf(":%d", port)
 	fmt.Printf("listen on %s\n", addr)
+
 	http.ListenAndServe(addr, r)
 }

@@ -4,15 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
 	"strconv"
 	"time"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	r "github.com/unrolled/render"
 	"gopkg.in/olahol/melody.v1"
 )
@@ -60,7 +59,7 @@ func status(w http.ResponseWriter, r *http.Request) {
 func echo(w http.ResponseWriter, r *http.Request) {
 	// read body first, will the parse form will drain the body
 	body := ""
-	buf, err := ioutil.ReadAll(r.Body)
+	buf, err := io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("err:", err)
 	} else {
@@ -127,7 +126,7 @@ func fileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	io.Copy(ioutil.Discard, file)
+	io.Copy(io.Discard, file)
 	w.WriteHeader(204)
 }
 
@@ -173,7 +172,7 @@ func main() {
 	}
 
 	r := chi.NewRouter()
-	r.Use(middleware.NewCompressor(5 ).Handler)
+	r.Use(middleware.NewCompressor(5).Handler)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)

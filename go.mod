@@ -1,12 +1,15 @@
 module github.com/wklken/echo
 
-go 1.16
+go 1.20
 
 require (
-	github.com/go-chi/chi v4.1.2+incompatible
-	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/unrolled/render v1.4.0
-	golang.org/x/net v0.0.0-20190522155817-f3200d17e092 // indirect
-	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
+	github.com/go-chi/chi/v5 v5.0.10
+	github.com/unrolled/render v1.6.1
 	gopkg.in/olahol/melody.v1 v1.0.0-20170518105555-d52139073376
+)
+
+require (
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 )

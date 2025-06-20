@@ -3,7 +3,7 @@ module github.com/wklken/echo
 go 1.20
 
 require (
-	github.com/go-chi/chi/v5 v5.0.10
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/unrolled/render v1.6.1
 	gopkg.in/olahol/melody.v1 v1.0.0-20170518105555-d52139073376
 )
